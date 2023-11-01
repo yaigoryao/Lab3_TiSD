@@ -1,0 +1,24 @@
+
+The graph is empty Sun Oct 15 17:54:24 2023
+
+Index can't be greater than matrix dimension Sun Oct 15 19:21:25 2023
+
+The graph is empty Sun Oct 15 19:25:12 2023
+
+Matrix dimension can't be lower than one Sun Oct 15 19:25:18 2023
+
+Index can't be greater than matrix dimension Sun Oct 15 19:25:59 2023
+
+The graph is empty Mon Oct 16 20:53:15 2023
+
+The graph is empty Mon Oct 16 20:53:27 2023
+
+Matrix dimension can't be lower than one Wed Oct 18 12:56:44 2023
+
+Matrix dimension can't be lower than one Wed Oct 18 12:58:19 2023
+
+Matrix dimension can't be lower than one Wed Oct 18 12:59:33 2023
+
+Index can't be greater than matrix dimension Wed Oct 18 13:31:19 2023
+
+The graph is empty Wed Oct 18 13:31:22 2023
