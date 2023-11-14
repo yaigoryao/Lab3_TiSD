@@ -214,3 +214,83 @@ void DFS()
 		std::cout << "Ошибка обхода" << std::endl;
 	}
 }
+
+void FloydWarshell()
+{
+	//graph.ReadFromFile(src.c_str());
+	try
+	{
+		if (graph.Empty()) throw new BaseE("Graph is empty");
+		//graph.ReadFromFile(src.c_str());
+		int source = 1, drainCtr = 1;
+		int* drains = nullptr;
+
+		std::cout << "Введите номер истока: " << std::endl;
+		std::cin >> source;
+		while (source <= 0 || source >= graph.GetDim())
+		{
+			std::cout << "Ошибка ввода, введите номер истока " << std::endl;
+			std::cin >> source;
+		}
+
+		std::cout << "Введите количество стоков: " << std::endl;
+		std::cin >> drainCtr;
+		while (drainCtr <= 0 || drainCtr >= graph.GetDim() - 1)
+		{
+			std::cout << "Ошибка ввода, введите количество стоков " << std::endl;
+			std::cin >> drainCtr;
+		}
+
+		/*std::cout << "Введите номер стока: " << std::endl;
+		std::cin >> drain;
+		while (drain <= 0 || drain >= graph.GetDim())
+		{
+			std::cout << "Ошибка ввода, введите номер истока " << std::endl;
+			std::cin >> drain;
+		}*/
+
+		drains = new int[drainCtr];
+		for (int i = 0; i < drainCtr; i++)
+		{
+			std::cout << "Введите номер стока " << i << ": " << std::endl;
+			std::cin >> drains[i];
+			bool equal = false;
+			for (int j = 0; j < i - 1; j++)
+			{
+				if (drains[i] == drains[j])
+				{
+					equal = true;
+					break;
+				}
+			}
+			while (drains[i] <= 0 || drains[i] >= graph.GetDim() + 1 || drains[i] == source || equal)
+			{
+				equal = false;
+				std::cout << "Ошибка ввода, введите номер стока " << i << ": " << std::endl;
+				std::cin >> drains[i];
+				equal = false;
+				for (int j = 0; j < i - 1; j++)
+				{
+					if (drains[i] == drains[j])
+					{
+						equal = true;
+						break;
+					}
+				}
+			}
+			drains[i] -= 1;
+		}
+		drains[0] = 6;
+		for (int i = 0; i < drainCtr; i++)
+		{
+			drains[i] -= 1;
+		}
+		graph.BFSFloydWarshell(source - 1, drainCtr, drains);
+		delete[] drains;
+		std::cout << "Поиск максимального потока" << std::endl;
+	}
+	catch (...)
+	{
+		std::cout << "Ошибка нахождения максимального потока" << std::endl;
+	}
+}

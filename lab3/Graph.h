@@ -5,6 +5,8 @@
 #include "C:\Users\Игорь\Desktop\учеба\LabRab\ЛР ВП 2 Сем\1 ЛР\LR1\LR1\myVector.h"
 #include "Exceptions.h"
 #include <fstream>
+#include <queue>
+#include <algorithm>
 
 struct RouteParams
 {
@@ -55,6 +57,14 @@ public:
 	}*/
 };
 
+bool vectorBool(PIA::myVector<bool> v)
+{
+	for (int i = 0; i < v.getSize(); i++)
+	{
+		if (v[i] == false) return false;
+	}
+	return true;
+}
 struct Routes
 {
 public:
@@ -82,9 +92,11 @@ public:
 	}
 };
 
+using namespace PIA;
 class Graph
 {
 private:
+	static const int infinity = 900000;
 	int** adjacency = nullptr;
 	int dim = 0;
 public:
@@ -93,6 +105,7 @@ public:
 		this->adjacency = 0;
 		this->dim = 0;
 	}
+
 	Graph(int dim)
 	{
 		this->dim = dim;
@@ -120,6 +133,23 @@ public:
 	int GetDim() const 
 	{
 		return this->dim;
+	}
+
+	int** AdjaencyCopy() const
+	{
+		int** copy = new int* [this->dim];
+		for (int i = 0; i < dim; i++)
+		{
+			this->adjacency[i] = new int[this->dim];
+		}
+		for (int i = 0; i < dim; i++)
+		{
+			for (int j = 0; j < dim; j++)
+			{
+				copy[i][j] = this->adjacency[i][j];
+			}
+		}
+		return copy;
 	}
 
 	void Update(int dim)
@@ -154,6 +184,402 @@ public:
 		return this->adjacency[i][j];
 	}
 
+	//PIA::myVector<int> BFS__(const Graph& gr, int beg, int end)
+	//{
+	//	myVector<int> q = myVector<int>();
+	//	myVector<bool> used = myVector<bool>(gr.dim, false);
+	//	//for (int i = 0; i < used.getSize(); i++)
+	//	//{
+	//	//	used.pushBack(false);
+	//	//}
+	//	myVector<int> d = myVector<int>(gr.dim, 0);
+	//	//for (int i = 0; i < d.getSize(); i++)
+	//	//{
+	//	//	d.pushBack(0);
+	//	//}
+	//	myVector<int> p = myVector<int>(gr.dim, 0);
+	//	//for (int i = 0; i < p.getSize(); i++)
+	//	//{
+	//	//	p.pushBack(0);
+	//	//}
+	//	q.pushFront(beg);
+	//	used[beg] = true;
+	//	p[beg] = -1;
+	//	while (!q.empty())
+	//	{
+	//		int v = 0;
+	//		if (!q.empty()) v = q.popFront();
+	//		for (size_t i = 0; i < gr.dim; i++)
+	//		{
+	//			int to = gr.adjacency[v][i];
+	//			if (!used[i] && to != 0)
+	//			{
+	//				used[i] = true;
+	//				q.pushBack(i);
+	//				d[i] = d[v] + 1;
+	//				p[i] = v;
+	//			}
+	//		}
+	//	}
+	//	
+	//	if (!used[end]) return myVector<int>();
+	//	else
+	//	{
+	//		myVector<int> path;
+	//		for (int v = end; v != -1; v = p[v])
+	//		{
+	//			path.pushBack(p[v]);
+	//		}
+	//		path.reverse();
+	//		return path;
+	//	}
+	//}
+	//std::vector<int> BFS__(const Graph& gr, int beg, int end)
+	//{
+	//	std::queue<int> q = std::queue<int>();
+	//	std::vector<bool> used = std::vector<bool>(gr.dim, false);
+	//	//for (int i = 0; i < used.getSize(); i++)
+	//	//{
+	//	//	used.pushBack(false);
+	//	//}
+	//	std::vector<int> d = std::vector<int>(gr.dim, 0);
+	//	//for (int i = 0; i < d.getSize(); i++)
+	//	//{
+	//	//	d.pushBack(0);
+	//	//}
+	//	std::vector<int> p = std::vector<int>(gr.dim, 0);
+	//	//for (int i = 0; i < p.getSize(); i++)
+	//	//{
+	//	//	p.pushBack(0);
+	//	//}
+	//	q.push(beg);
+	//	used[beg] = true;
+	//	p[beg] = -1;
+	//	while (!q.empty())
+	//	{
+	//		int v = q.front();
+	//		q.pop();
+	//		for (size_t i = 0; i < gr.dim; i++)
+	//		{
+	//			int to = gr.adjacency[v][i];
+	//			if (to != 0 && !used[i])
+	//			{
+	//				used[i] = true;
+	//				q.push(i);
+	//				d[i] = d[v] + 1;
+	//				p[i] = v;
+	//			}
+	//		}
+	//	}
+
+	//	if (!used[end]) return std::vector<int>();
+	//	else
+	//	{
+	//		std::vector<int> path;
+	//		for (int v = end; v != -1; v = p[v])
+	//		{
+	//			path.push_back(p[v]);
+	//		}
+	//		std::reverse(path.begin(), path.end());
+	//		return path;
+	//	}
+	//}
+
+	/*std::vector<int> BFS__(const Graph& gr, int beg, int end)
+	{
+		if (beg == end) return std::vector<int>();
+		std::vector<bool> visited = std::vector<bool>(gr.dim, false);
+		std::queue<int> q = std::queue<int>();
+		visited[beg] = true;
+		q.push(beg);
+		std::vector<int> path = std::vector<int>();
+		path.push_back(beg);
+		while (!q.empty())
+		{
+			int s = q.front();
+			q.pop();
+			for (auto i = 0; i < gr.dim; i++)
+			{
+				if (!visited[i] && gr.adjacency[s][i] != 0)
+				{
+					if (i == end)
+					{
+						path.push_back(i);
+						return path;
+					}
+					else
+					{
+						visited[i] = true;
+						path.push_back(i);
+						q.push(i);
+					}
+				}
+			}
+			auto t = std::find(path.begin(), path.end(), );
+		}
+		if (path.empty()) return std::vector<int>();
+	}*/
+	//std::vector<int> BFS__(const Graph& gr, int beg, int end)
+	//{
+	//	if (beg == end) return std::vector<int>();
+	//	std::vector<bool> visited = std::vector<bool>(gr.dim, false);
+	//	std::queue<int> q = std::queue<int>();
+	//	visited[beg] = true;
+	//	q.push(beg);
+	//	std::vector<int> path = std::vector<int>();
+	//	path.push_back(beg);
+	//	while (!q.empty())
+	//	{
+	//		int p = q.front();
+	//		q.pop();
+	//		path.push_back(p);
+	//		//path.pop_back();
+	//		//path.push_back(p);
+	//		if (p == end)
+	//		{
+	//			return path;
+	//		}
+	//		for (int i = 0; i < gr.dim; i++)
+	//		{
+	//			if (!visited[i] && gr.adjacency[p][i] != 0)
+	//			{
+	//				visited[i] = true;
+	//				q.push(i);
+	//			}
+	//		}
+	//	}
+	//}
+	std::vector<int> BFS__(const Graph& gr, int beg, int end)
+	{
+		std::queue<int> q;
+		std::vector<bool> visited = std::vector<bool>(gr.dim, false);
+		std::vector<int> d = std::vector<int>(gr.dim, 0);
+		std::vector<int> p = std::vector<int>(gr.dim, 0);
+		q.push(beg);
+		visited[beg] = true;
+		p[beg] = -1;
+		while (!q.empty())
+		{
+			int v = q.front();
+			q.pop();
+			for (int i = 0; i < gr.dim; i++)
+			{
+				if (gr.adjacency[v][i] != 0 && !visited[i])
+				{
+					visited[i] = true;
+					q.push(i);
+					d[i] = d[v] + 1;
+					p[i] = v;
+				}
+			}
+		}
+		std::vector<int>path = std::vector<int>();
+		if (p[end] == 0) return path;
+		for (int v = end; v != -1; v = p[v])
+		{
+			path.push_back(v);
+		}
+		std::reverse(path.begin(), path.end());
+		//std::reverse(p.begin(), p.end());
+		return path;
+	}
+
+	void AddVertexAuto(int prevCtr, int* prev)
+	{
+		int** temp = new int* [this->dim + 1];
+		for (int i = 0; i < this->dim + 1; i++)
+		{
+			temp[i] = new int[this->dim + 1];
+		}
+		for (int i = 0; i < this->dim; i++)
+		{
+			for (int j = 0; j < this->dim; j++)
+			{
+				temp[i][j] = adjacency[i][j];
+			}
+		}
+		//Update(this->dim + 1);
+		this->dim += 1;
+		for (int i = 0; i < this->dim; i++)
+		{
+			temp[i][this->dim-1] = 0;
+		}
+		for (int i = 0; i < this->dim; i++)
+		{
+			temp[this->dim-1][i] = 0;
+		}
+		for (int i = 0; i<prevCtr; i++)
+		{
+			temp[prev[i]][this->dim - 1] = 999999;
+		}
+		//for (int i = 0; i < dim - 1; i++)
+		//{
+		//	std::cout << "Введите вес между городами " << (char)(dim - 1 + 'A') << " и " << (char)(i + 'A') << ": ";
+		//	int val = 0;
+		//	while (!(std::cin >> val))
+		//	{
+		//		std::cin.clear();
+		//		std::cin.ignore(INT_MAX, '\n');
+		//		std::cout << "\nОшибка! Введено некорректное значение!\n Попробуйте снова.\n";
+		//	}
+		//	temp[dim - 1][i] = val;
+		//	temp[i][dim - 1] = val;
+		//	//temp[dim][i] = val;
+		//	//temp[i][dim] = val;
+		//}
+		temp[dim - 1][dim - 1] = 0;
+
+		if (this->adjacency)
+		{
+			for (int i = 0; i < this->dim - 1; i++)
+			{
+				if (this->adjacency[i]) delete[] this->adjacency[i];
+			}
+		}
+		this->adjacency = temp;
+	}
+
+	Graph BFSFloydWarshell(int source, int drainCtr, int* drains)
+	{
+		try
+		{
+			Graph temp = *this;
+			temp.AddVertexAuto(drainCtr, drains);
+			std::cout << "Исходная сеть: " << std::endl;
+			temp.Print();
+			int dest = temp.GetDim() - 1;
+			std::vector<int> path = std::vector<int>(1, 0);
+			//path.push_back(0);
+			int maxStream = 0;
+			int ctr = 1;
+			while (!path.empty())
+			{
+				path.clear();
+				path = BFS__(temp, source, dest);
+				if (path.size() <= 1) break;
+				//path.erase(path.cbegin(), path.cbegin()+1);
+				path.erase(path.end()-1, path.end());
+				path.push_back(dest);
+				int minStr = 99999;
+				for (int i = 0; i < path.size() - 1; i++)
+				{
+					int pathcost = temp.adjacency[path[i]][path[i + 1]];
+					if (minStr > temp.adjacency[path[i]][path[i + 1]] && temp.adjacency[path[i]][path[i + 1]] != 0)
+						//minStr < temp.adjacency[path[i]][path[i + 1]] ? minStr : temp.adjacency[path[i]][path[i + 1]];
+						minStr = temp.adjacency[path[i]][path[i + 1]];
+				}
+				maxStream += minStr;
+				std::cout << std::endl << "Шаг " << ctr << std::endl;
+				for (int i = 0; i < path.size() - 1; i++)
+				{
+					temp.adjacency[path[i]][path[i + 1]] -= minStr;
+					temp.adjacency[path[i + 1]][path[i]] += minStr;
+				}
+				std::cout << "Путь из истока в сток: ";
+				for (auto& e : path) std::cout << e;
+				std::cout << std::endl << "Макс. поток через путь: ";
+				std::cout <<  minStr << std::endl;
+				std::cout << "Остаточная сеть: " << std::endl;
+				temp.Print();
+				ctr++;
+			}
+			std::cout << "Максимальный поток = " << maxStream << std::endl;
+			//Graph min = *this;
+			//int maxStream = 0;
+			//PIA::myVector<bool> visited = PIA::myVector<bool>();
+
+			//for (int k = 0; k < min.dim; k++)
+			//{
+			//	for (int i = 0; i < min.dim; i++)
+			//	{
+			//		for (int j = 0; j < min.dim; j++)
+			//		{
+			//			min.adjacency[i][j] = std::min(min.adjacency[i][j], min.adjacency[i][k] + min.adjacency[k][j]);
+			//			/*if (min.adjacency[i][j] > min.adjacency[i][k] + min.adjacency[k][j])
+			//				min.adjacency[i][j] = min.adjacency[i][k] + min.adjacency[k][j];*/
+			//		}
+			//	}
+			//}
+			//min.Print();
+			/*int maxStream = 0;
+			for (int i = 0; i < drainCtr; i++)
+			{
+				maxStream += min.adjacency[source][drains[i]];
+			}*/
+			//std::cout << "Максимальный поток из " << source + 1 << " в стоки равен: " << maxStream << std::endl;
+		}
+		catch (...)
+		{
+			throw new BaseE("Error occured during FloydWarshell algorithm process");
+			return Graph();
+		}
+	}
+	//Graph BFSFloydWarshell(int source, int drainCtr, int* drains) 
+	//{
+	//	try
+	//	{
+	//		Graph temp = *this;
+	//		temp.AddVertexAuto(drainCtr, drains);
+	//		temp.Print();
+	//		int dest = temp.GetDim() - 1;
+	//		myVector<int> path = myVector<int>();
+	//		path.pushBack(0);
+	//		int maxStream = 0;
+	//		while (!path.empty())
+	//		{
+	//			path.clear();
+	//			path = BFS__(temp, source, dest).empty();
+	//			int minStr = 99999;
+	//			for (int i = 0; i < path.getSize() - 1; i++)
+	//			{
+	//				if(minStr < temp.adjacency[path[i]][path[i + 1]] && temp.adjacency[path[i]][path[i + 1]]!=0)
+	//				//minStr < temp.adjacency[path[i]][path[i + 1]] ? minStr : temp.adjacency[path[i]][path[i + 1]];
+	//					minStr = temp.adjacency[path[i]][path[i + 1]];
+	//			}
+	//			maxStream += minStr;
+	//			for (int i = 0; i < path.getSize() - 1; i++)
+	//			{
+	//				temp.adjacency[path[i]][path[i + 1]] -= minStr;
+	//				temp.adjacency[path[i + 1]][path[i]] += minStr;
+	//			}
+	//			temp.Print();
+	//		}
+	//		std::cout << "Максимальный поток = " << maxStream << std::endl;
+	//		//Graph min = *this;
+	//		//int maxStream = 0;
+	//		//PIA::myVector<bool> visited = PIA::myVector<bool>();
+	//		
+	//		//for (int k = 0; k < min.dim; k++)
+	//		//{
+	//		//	for (int i = 0; i < min.dim; i++)
+	//		//	{
+	//		//		for (int j = 0; j < min.dim; j++)
+	//		//		{
+	//		//			min.adjacency[i][j] = std::min(min.adjacency[i][j], min.adjacency[i][k] + min.adjacency[k][j]);
+	//		//			/*if (min.adjacency[i][j] > min.adjacency[i][k] + min.adjacency[k][j])
+	//		//				min.adjacency[i][j] = min.adjacency[i][k] + min.adjacency[k][j];*/
+	//		//		}
+	//		//	}
+	//		//}
+	//		//min.Print();
+	//		/*int maxStream = 0;
+	//		for (int i = 0; i < drainCtr; i++)
+	//		{
+	//			maxStream += min.adjacency[source][drains[i]];
+	//		}*/
+	//		//std::cout << "Максимальный поток из " << source + 1 << " в стоки равен: " << maxStream << std::endl;
+	//	}
+	//	catch (...)
+	//	{
+	//		throw new BaseE("Error occured during FloydWarshell algorithm process");
+	//		return Graph();
+	//	}
+	//}
+	bool Empty()
+	{
+		if (this->dim == 0) return true;
+		else return false;
+	}
 	void Print() const
 	{
 		if (!this->adjacency) throw new BaseE("The graph is empty");
@@ -163,15 +589,18 @@ public:
 			{
 				if (i == 0 && j == 0)
 				{
-					std::cout << std::setw(3) << 'г';
+					std::cout << std::setw(7) << std::resetiosflags(std::ios::left) << 'г';
 				}
 				else if (i == 0 || j == 0)
 				{
-					std::cout << std::setw(3) << (char)('A' - 1 + i + j);
+					std::cout << std::setw(7) << std::resetiosflags(std::ios::left) << (- 1 + i + j);//(char)('A' - 1 + i + j);
 				}
 				else
 				{
-					std::cout << std::setw(3) << adjacency[i-1][j-1];
+					if(adjacency[i-1][j-1] < infinity)
+						std::cout << std::setw(7) << std::resetiosflags(std::ios::left) << adjacency[i-1][j-1];
+					else 
+						std::cout << std::setw(7) << std::resetiosflags(std::ios::left) << "inf";
 				}
 			}
 			std::cout << std::endl;
@@ -528,6 +957,67 @@ public:
 				DFS(visited, i);
 			}
 		}
+	}
+	Graph(const Graph& other)
+	{
+		this->dim = other.dim;
+		if (this->adjacency)
+		{
+			for (int i = 0; i < dim; i++)
+			{
+				if (adjacency[i]) delete[] adjacency[i];
+			}
+		}
+		if (other.adjacency)
+		{
+			this->adjacency = new int* [dim];
+			for (int i = 0; i < this->dim; i++)
+			{
+				this->adjacency[i] = new int[dim];
+			}
+			for (int i = 0; i < dim; i++)
+			{
+				for (int j = 0; j < dim; j++)
+				{
+					this->adjacency[i][j] = other.adjacency[i][j];
+				}
+			}
+		}
+		else this->adjacency = nullptr;
+	}
+
+	Graph(Graph&& other)
+	{
+		this->dim = other.dim;
+		if (this->adjacency)
+		{
+			for (int i = 0; i < dim; i++)
+			{
+				if (adjacency[i]) delete[] adjacency[i];
+			}
+		}
+		if (other.adjacency)
+		{
+			this->adjacency = new int* [dim];
+			for (int i = 0; i < this->dim; i++)
+			{
+				this->adjacency[i] = new int[dim];
+			}
+			for (int i = 0; i < dim; i++)
+			{
+				for (int j = 0; j < dim; j++)
+				{
+					this->adjacency[i][j] = other.adjacency[i][j];
+				}
+			}
+		}
+		else this->adjacency = nullptr;
+		other.dim = 0;
+		for (int i = 0; i < other.dim; i++)
+		{
+			delete[] other.adjacency[i];
+		}
+		other.adjacency = nullptr;
 	}
 	/*void PrintList(bool* visited)
 	{

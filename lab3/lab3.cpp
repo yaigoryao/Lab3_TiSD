@@ -8,7 +8,7 @@ using namespace std;
 int main(int argc, char** argv)
 {
 	setlocale(0, "");
-	if (Start(argc, argv))
+	//if (Start(argc, argv))
 	{
 		Menu menu = Menu("Петроченков И. А. ИУК4-32Б");
 		menu.AddItem("Получить размерность матрицы соответствий", GetGraphDim);
@@ -23,6 +23,7 @@ int main(int argc, char** argv)
 		menu.AddItem("Запись в файл матрицы соответствий", FileWrite);
 		menu.AddItem("Чтение из файла матрицы соответствий", ReadFromFile);
 		menu.AddItem("Обход графа в глубину", DFS);
+		menu.AddItem("Поиск максимального потока", FloydWarshell);
 		menu.RunMenu();
 	}
 }

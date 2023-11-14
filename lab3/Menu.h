@@ -1,5 +1,5 @@
 #pragma once
-#include "Addition.h"
+//#include "Addition.h"
 #pragma once
 #include "MenuItem.h"
 #include <Windows.h>
@@ -53,6 +53,7 @@ Menu::Menu(string name, int countOfItems, MenuItem* items[]) {
 }
 
 void Menu::PrintMenu() {
+	system("cls");
 	cout << name << "\n";
 	for (int i = 0; i < countOfItem; i++) {
 		cout << "  [" << i + 1 << "] " << items[i].Name();
