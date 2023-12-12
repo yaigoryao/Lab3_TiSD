@@ -8,7 +8,7 @@ using namespace std;
 int main(int argc, char** argv)
 {
 	setlocale(0, "");
-	//if (Start(argc, argv))
+	if (Start(argc, argv))
 	{
 		Menu menu = Menu("Петроченков И. А. ИУК4-32Б");
 		menu.AddItem("Получить размерность матрицы соответствий", GetGraphDim);

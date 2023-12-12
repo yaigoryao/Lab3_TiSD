@@ -22,7 +22,7 @@ bool InputError()
 
 bool Start(int argc, char* argv[])
 {
-	std::string message = "Параметры запуска программы:\nsource.txt - обязательный параметр, место хранения словаря\n";
+	std::string message = "Параметры запуска программы:\nsource.txt - обязательный параметр, место хранения графа\ndestination.txt - обязательный параметр, место записи графа\n";
 	if (argc <= 1)
 	{
 		//std::cout << argc << std::endl;
@@ -31,13 +31,15 @@ bool Start(int argc, char* argv[])
 	}
 	else
 	{
-		if (argc == 2)
+		if (argc == 3)
 		{
 			//std::cout << argc << std::endl;
-			dst = argv[1];
+			src = argv[1];
+			dst = argv[2];
+			std::cout << dst;
 			return true;
 		}
-		else if (argc > 2)
+		else if (argc > 3)
 		{
 			//std::cout << argc << std::endl;
 			std::cout << message << std::endl;
@@ -178,10 +180,11 @@ void FileWrite()
 {
 	try
 	{
-		std::cout << "Введите путь файла: " << std::endl;
-		std::string path = "";
-		std::cin >> path;
-		graph.WriteInFile(path.c_str());
+		//std::cout << "Введите путь файла: " << std::endl;
+		//std::string path = "";
+		//std::cin >> path;
+		graph.WriteInFile(dst.c_str());
+		std::cout << "Успешная запись в файл!" << std::endl;
 	}
 	catch (...)
 	{
@@ -220,7 +223,12 @@ void FloydWarshell()
 	//graph.ReadFromFile(src.c_str());
 	try
 	{
-		if (graph.Empty()) throw new BaseE("Graph is empty");
+		if (graph.Empty())
+		{
+			std::cout << "Ошибка, граф пустой!" << std::endl;
+			return;
+		}
+		// throw new BaseE("Graph is empty");
 		//graph.ReadFromFile(src.c_str());
 		int source = 1, drainCtr = 1;
 		int* drains = nullptr;
@@ -255,7 +263,7 @@ void FloydWarshell()
 			std::cout << "Введите номер стока " << i << ": " << std::endl;
 			std::cin >> drains[i];
 			bool equal = false;
-			for (int j = 0; j < i - 1; j++)
+			for (int j = 0; j < i; j++)
 			{
 				if (drains[i] == drains[j])
 				{
@@ -263,13 +271,13 @@ void FloydWarshell()
 					break;
 				}
 			}
-			while (drains[i] <= 0 || drains[i] >= graph.GetDim() + 1 || drains[i] == source || equal)
+			while (drains[i] <= 0 || drains[i] > graph.GetDim() + 1 || drains[i] == source || equal)
 			{
 				equal = false;
 				std::cout << "Ошибка ввода, введите номер стока " << i << ": " << std::endl;
 				std::cin >> drains[i];
 				equal = false;
-				for (int j = 0; j < i - 1; j++)
+				for (int j = 0; j < i; j++)
 				{
 					if (drains[i] == drains[j])
 					{
@@ -280,11 +288,11 @@ void FloydWarshell()
 			}
 			drains[i] -= 1;
 		}
-		drains[0] = 6;
-		for (int i = 0; i < drainCtr; i++)
-		{
-			drains[i] -= 1;
-		}
+		//drains[0] = 6;
+		//for (int i = 0; i < drainCtr; i++)
+		//{
+		//	drains[i] -= 1;
+		//}
 		graph.BFSFloydWarshell(source - 1, drainCtr, drains);
 		delete[] drains;
 		std::cout << "Поиск максимального потока" << std::endl;

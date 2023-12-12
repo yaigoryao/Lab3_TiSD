@@ -349,6 +349,43 @@ public:
 	//		}
 	//	}
 	//}
+	myVector<int> __BFS__(const Graph& gr, int beg, int end)
+	{
+		myVector<int> q;
+		myVector<bool> visited = myVector<bool>(gr.dim, false);
+		myVector<int> d = myVector<int>(gr.dim, 0);
+		myVector<int> p = myVector<int>(gr.dim, 0);
+		q.pushFront(beg);
+		visited[beg] = true;
+		p[beg] = -1;
+		while (!q.empty())
+		{
+			int v = q.popBack();
+			// q.pop();
+			for (int i = 0; i < gr.dim; i++)
+			{
+				if (gr.adjacency[v][i] != 0 && !visited[i])
+				{
+					visited[i] = true;
+					q.pushFront(i);
+					d[i] = d[v] + 1;
+					p[i] = v;
+				}
+			}
+		}
+		myVector<int>path = myVector<int>();
+		if (p[end] == 0) return path;
+		for (int v = end; v != -1; v = p[v])
+		{
+			path.pushBack(v);
+		}
+		
+		//std::reverse(path.begin(), path.end());
+		//std::reverse(p.begin(), p.end());
+		path.reverse();
+		return myVector<int>(path);
+	}
+
 	std::vector<int> BFS__(const Graph& gr, int beg, int end)
 	{
 		std::queue<int> q;
@@ -439,6 +476,82 @@ public:
 		this->adjacency = temp;
 	}
 
+
+					//Graph BFSFloydWarshell(int source, int drainCtr, int* drains)
+					//{
+					//	try
+					//	{
+					//		Graph temp = *this;
+					//		temp.AddVertexAuto(drainCtr, drains);
+					//		std::cout << "Исходная сеть: " << std::endl;
+					//		temp.Print();
+					//		int dest = temp.GetDim() - 1;
+					//		std::vector<int> path = std::vector<int>(1, 0);
+					//		//path.push_back(0);
+					//		int maxStream = 0;
+					//		int ctr = 1;
+					//		while (!path.empty())
+					//		{
+					//			path.clear();
+					//			path = BFS__(temp, source, dest);
+					//			if (path.size() <= 1) break;
+					//			//path.erase(path.cbegin(), path.cbegin()+1);
+					//			path.erase(path.end() - 1, path.end());
+					//			path.push_back(dest);
+					//			int minStr = 99999;
+					//			for (int i = 0; i < path.size() - 1; i++)
+					//			{
+					//				int pathcost = temp.adjacency[path[i]][path[i + 1]];
+					//				if (minStr > temp.adjacency[path[i]][path[i + 1]] && temp.adjacency[path[i]][path[i + 1]] != 0)
+					//					//minStr < temp.adjacency[path[i]][path[i + 1]] ? minStr : temp.adjacency[path[i]][path[i + 1]];
+					//					minStr = temp.adjacency[path[i]][path[i + 1]];
+					//			}
+					//			maxStream += minStr;
+					//			std::cout << std::endl << "Шаг " << ctr << std::endl;
+					//			for (int i = 0; i < path.size() - 1; i++)
+					//			{
+					//				temp.adjacency[path[i]][path[i + 1]] -= minStr;
+					//				temp.adjacency[path[i + 1]][path[i]] += minStr;
+					//			}
+					//			std::cout << "Путь из истока в сток: ";
+					//			for (auto& e : path) std::cout << e;
+					//			std::cout << std::endl << "Макс. поток через путь: ";
+					//			std::cout << minStr << std::endl;
+					//			std::cout << "Остаточная сеть: " << std::endl;
+					//			temp.Print();
+					//			ctr++;
+					//		}
+					//		std::cout << "Максимальный поток = " << maxStream << std::endl;
+					//		//Graph min = *this;
+					//		//int maxStream = 0;
+					//		//PIA::myVector<bool> visited = PIA::myVector<bool>();
+
+					//		//for (int k = 0; k < min.dim; k++)
+					//		//{
+					//		//	for (int i = 0; i < min.dim; i++)
+					//		//	{
+					//		//		for (int j = 0; j < min.dim; j++)
+					//		//		{
+					//		//			min.adjacency[i][j] = std::min(min.adjacency[i][j], min.adjacency[i][k] + min.adjacency[k][j]);
+					//		//			/*if (min.adjacency[i][j] > min.adjacency[i][k] + min.adjacency[k][j])
+					//		//				min.adjacency[i][j] = min.adjacency[i][k] + min.adjacency[k][j];*/
+					//		//		}
+					//		//	}
+					//		//}
+					//		//min.Print();
+					//		/*int maxStream = 0;
+					//		for (int i = 0; i < drainCtr; i++)
+					//		{
+					//			maxStream += min.adjacency[source][drains[i]];
+					//		}*/
+					//		//std::cout << "Максимальный поток из " << source + 1 << " в стоки равен: " << maxStream << std::endl;
+					//	}
+					//	catch (...)
+					//	{
+					//		throw new BaseE("Error occured during FloydWarshell algorithm process");
+					//		return Graph();
+					//	}
+					//}
 	Graph BFSFloydWarshell(int source, int drainCtr, int* drains)
 	{
 		try
@@ -448,20 +561,21 @@ public:
 			std::cout << "Исходная сеть: " << std::endl;
 			temp.Print();
 			int dest = temp.GetDim() - 1;
-			std::vector<int> path = std::vector<int>(1, 0);
+			myVector<int> path = myVector<int>(1, 0);
 			//path.push_back(0);
 			int maxStream = 0;
 			int ctr = 1;
 			while (!path.empty())
 			{
 				path.clear();
-				path = BFS__(temp, source, dest);
-				if (path.size() <= 1) break;
+				path = __BFS__(temp, source, dest);
+				if (path.getSize() <= 1) break;
 				//path.erase(path.cbegin(), path.cbegin()+1);
-				path.erase(path.end()-1, path.end());
-				path.push_back(dest);
+				//path.erase(path.end()-1, path.end());
+				path.popBack();
+				path.pushBack(dest);
 				int minStr = 99999;
-				for (int i = 0; i < path.size() - 1; i++)
+				for (int i = 0; i < path.getSize() - 1; i++)
 				{
 					int pathcost = temp.adjacency[path[i]][path[i + 1]];
 					if (minStr > temp.adjacency[path[i]][path[i + 1]] && temp.adjacency[path[i]][path[i + 1]] != 0)
@@ -470,7 +584,7 @@ public:
 				}
 				maxStream += minStr;
 				std::cout << std::endl << "Шаг " << ctr << std::endl;
-				for (int i = 0; i < path.size() - 1; i++)
+				for (int i = 0; i < path.getSize() - 1; i++)
 				{
 					temp.adjacency[path[i]][path[i + 1]] -= minStr;
 					temp.adjacency[path[i + 1]][path[i]] += minStr;
